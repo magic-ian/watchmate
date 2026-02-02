@@ -30,3 +30,6 @@ pub const CHR_MP_SHUFFLE: Uuid = uuid!("0000000c-78fc-48fe-8e23-433b3a1942d0");
 
 pub const CHR_STEP_COUNT: Uuid = uuid!("00030001-78fc-48fe-8e23-433b3a1942d0");
 pub const _CHR_MOTION: Uuid = uuid!("00030002-78fc-48fe-8e23-433b3a1942d0");
+
+pub const SRV_WEATHER: Uuid = uuid!("00050000-78fc-48fe-8e23-433b3a1942d0");
+pub const CHR_WEATHER_DATA: Uuid = uuid!("00050001-78fc-48fe-8e23-433b3a1942d0");
