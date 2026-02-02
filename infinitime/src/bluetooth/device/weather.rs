@@ -72,8 +72,9 @@ impl InfiniTime {
         data.push(weather.icon as u8);
 
         // Sunrise and sunset (2 bytes each, little-endian)
-        let sunrise = weather.sunrise.unwrap_or(u16::MAX) as i16;
-        let sunset = weather.sunset.unwrap_or(u16::MAX) as i16;
+        // -1 means unknown according to InfiniTime protocol
+        let sunrise = weather.sunrise.map(|s| s as i16).unwrap_or(-1);
+        let sunset = weather.sunset.map(|s| s as i16).unwrap_or(-1);
         data.extend_from_slice(&sunrise.to_le_bytes());
         data.extend_from_slice(&sunset.to_le_bytes());
 
