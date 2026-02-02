@@ -11,6 +11,7 @@ pub mod fwupd;
 pub mod notification;
 pub mod media_player;
 pub mod resources;
+pub mod weather;
 
 
 #[derive(Debug)]
