@@ -15,6 +15,7 @@ Please ensure this implementation:
 
 3. **Creates .deb packages for releases**:
    - Set up GitHub Actions workflow to build .deb packages for both x86_64 and ARM architectures
+   - **Target Debian Trixie** for the .deb builds
    - Include the .deb builds in GitHub Releases
    - Ensure the packages follow Debian packaging standards
    - Test that the packages install and run correctly on both architectures
