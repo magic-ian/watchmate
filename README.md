@@ -12,6 +12,7 @@ Visually optimized for GNOME, adaptive for phone and desktop, Linux only.
 - Data reading: battery level, heart rate, steps count, firmware version.
 - OTA firmware and external resources updates. Both, from manually specified DFU/resources files, or automatically downloaded from [InfiniTime releases](https://github.com/InfiniTimeOrg/InfiniTime/releases) for selected version.
 - Media-player control.
+- Weather provider integration (requires weather app with D-Bus support).
 - Notifications forwarding.
 
 ## Install
@@ -86,6 +87,19 @@ flatpak-builder --install target/flatpak flatpak/io.gitlab.azymohliad.WatchMate.
 ```
 
 Here and above, `target/flatpak` is the build directory. It's a convenient default for Rust project (`target` is already in `.gitignore`), but can be anything else.
+
+## Weather Provider Integration
+
+Watchmate supports weather provider integration, allowing you to view weather information on your InfiniTime watch. The weather provider selector works similarly to the media player control.
+
+**Current Status**: The infrastructure is in place, but requires weather applications to expose their data via D-Bus. See [WEATHER_PROVIDER_INTEGRATION.md](WEATHER_PROVIDER_INTEGRATION.md) for details on how weather apps (KDE Weather, GNOME Weather, etc.) can add D-Bus support.
+
+**Supported Providers** (once D-Bus support is added):
+- KDE Weather (kweather)
+- GNOME Weather
+- Any weather application that implements the specified D-Bus interface
+
+The weather provider works regardless of installation method (binary, Flatpak, Snap, AppImage).
 
 ## Tech Stack and Thanks
 
