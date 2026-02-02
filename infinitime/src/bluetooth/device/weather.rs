@@ -2,6 +2,9 @@ use super::super::uuids;
 use super::InfiniTime;
 use anyhow::Result;
 
+/// Maximum number of forecast days supported by InfiniTime SimpleWeatherService
+const MAX_FORECAST_DAYS: usize = 5;
+
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum WeatherIcon {
@@ -89,11 +92,11 @@ impl InfiniTime {
         // Timestamp (8 bytes, little-endian)
         data.extend_from_slice(&forecast.timestamp.to_le_bytes());
         
-        // Number of days (max 5)
-        let num_days = forecast.days.len().min(5) as u8;
+        // Number of days (max MAX_FORECAST_DAYS)
+        let num_days = forecast.days.len().min(MAX_FORECAST_DAYS) as u8;
         data.push(num_days);
         
-        // Day forecasts (5 days, 5 bytes each)
+        // Day forecasts (MAX_FORECAST_DAYS days, 5 bytes each)
         for day in &forecast.days[..num_days as usize] {
             data.extend_from_slice(&day.min_temperature.to_le_bytes());
             data.extend_from_slice(&day.max_temperature.to_le_bytes());
@@ -101,7 +104,7 @@ impl InfiniTime {
         }
         
         // Pad remaining days with zeros if needed
-        for _ in num_days..5 {
+        for _ in num_days..(MAX_FORECAST_DAYS as u8) {
             data.extend_from_slice(&[0, 0, 0, 0, 0]);
         }
         

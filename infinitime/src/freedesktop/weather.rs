@@ -5,6 +5,12 @@ use futures::{Stream, StreamExt};
 
 use crate::bt::device::weather::{CurrentWeather, WeatherForecast, WeatherIcon};
 
+/// D-Bus service name for KDE Weather
+const KWEATHER_SERVICE: &str = "org.kde.kweather";
+
+/// D-Bus service name for GNOME Weather
+const GNOME_WEATHER_SERVICE: &str = "org.gnome.Weather";
+
 #[derive(Debug, Clone)]
 pub struct WeatherProvider {
     pub name: String,
@@ -25,13 +31,13 @@ pub async fn get_providers(connection: &Connection) -> Result<Vec<WeatherProvide
     let mut providers = Vec::new();
     
     // Check for KDE Weather (org.kde.kweather)
-    if check_service_exists(connection, "org.kde.kweather").await? {
-        providers.push(WeatherProvider::new("KDE Weather", "org.kde.kweather"));
+    if check_service_exists(connection, KWEATHER_SERVICE).await? {
+        providers.push(WeatherProvider::new("KDE Weather", KWEATHER_SERVICE));
     }
     
     // Check for GNOME Weather (org.gnome.Weather)
-    if check_service_exists(connection, "org.gnome.Weather").await? {
-        providers.push(WeatherProvider::new("GNOME Weather", "org.gnome.Weather"));
+    if check_service_exists(connection, GNOME_WEATHER_SERVICE).await? {
+        providers.push(WeatherProvider::new("GNOME Weather", GNOME_WEATHER_SERVICE));
     }
     
     Ok(providers)
@@ -85,26 +91,24 @@ pub async fn get_providers_update_stream(
             let name = args.name.as_str();
             
             // Only monitor weather-related services
-            if name != "org.kde.kweather" && name != "org.gnome.Weather" {
-                return None;
-            }
-            
-            let provider_name = if name == "org.kde.kweather" {
-                "KDE Weather"
-            } else {
-                "GNOME Weather"
+            let provider_info = match name {
+                KWEATHER_SERVICE => Some("KDE Weather"),
+                GNOME_WEATHER_SERVICE => Some("GNOME Weather"),
+                _ => None,
             };
             
-            if args.new_owner.is_some() {
-                Some(ProvidersListEvent::ProviderAdded(WeatherProvider::new(
-                    provider_name,
-                    name,
-                )))
-            } else {
-                Some(ProvidersListEvent::ProviderRemoved(
-                    args.name.clone().into_inner(),
-                ))
-            }
+            provider_info.and_then(|provider_name| {
+                if args.new_owner.is_some() {
+                    Some(ProvidersListEvent::ProviderAdded(WeatherProvider::new(
+                        provider_name,
+                        name,
+                    )))
+                } else {
+                    Some(ProvidersListEvent::ProviderRemoved(
+                        args.name.clone().into_inner(),
+                    ))
+                }
+            })
         });
     
     Ok(stream)

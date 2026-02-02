@@ -1,6 +1,6 @@
 use futures::StreamExt;
 use gtk::prelude::{BoxExt, OrientableExt, WidgetExt};
-use infinitime::{bt, fdo::weather, zbus};
+use infinitime::{bt, fdo::weather, tokio, zbus};
 use relm4::{gtk, Component, ComponentParts, ComponentSender, JoinHandle, RelmWidgetExt};
 use std::sync::Arc;
 
@@ -127,21 +127,25 @@ impl Component for Model {
                         let dbus_session = self.dbus_session.clone();
                         let task_handle = relm4::spawn(async move {
                             // This is where we would periodically fetch weather data
-                            // and send it to the watch. For now, just log it.
+                            // and send it to the watch. For now, just keep the session active.
                             log::info!(
                                 "Weather session started for provider: {}",
                                 provider.name
                             );
                             // TODO: Implement periodic weather updates
-                            sender.input(Input::WeatherSessionEnded);
+                            // The task should loop and periodically fetch/send weather data
+                            // For now, we keep the task running indefinitely
+                            loop {
+                                tokio::time::sleep(tokio::time::Duration::from_secs(3600)).await;
+                            }
                         });
                         self.weather_task = Some(task_handle);
                     }
                 }
             }
             Input::WeatherSessionEnded => {
-                self.provider_handles.clear();
-                self.provider_names = gtk::StringList::new(&[]);
+                // Session ended unexpectedly - just clear the task handle
+                // Don't clear providers as they're still available
                 self.weather_task = None;
             }
             Input::ProviderUpdateSessionStart => {
