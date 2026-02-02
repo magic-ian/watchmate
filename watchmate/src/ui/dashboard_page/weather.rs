@@ -106,7 +106,7 @@ impl Component for Model {
                 }
             }
             Input::WeatherUpdateSessionStart => {
-                if let Some(_infinitime) = self.infinitime.clone() {
+                if let Some(infinitime) = self.infinitime.clone() {
                     if let Some(dbus_session) = self.dbus_session.clone() {
                         self.stop_update_task();
                         let task_handle = relm4::spawn(async move {
@@ -124,6 +124,8 @@ impl Component for Model {
                                     log::error!("Failed to discover weather providers: {error}");
                                 }
                             }
+                            // Keep infinitime in scope to prevent unused warning
+                            let _ = infinitime;
                             sender.input(Input::WeatherUpdateSessionEnded);
                         });
                         self.update_task = Some(task_handle);

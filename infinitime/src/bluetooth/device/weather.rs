@@ -2,6 +2,9 @@ use super::{uuids, InfiniTime};
 use anyhow::Result;
 use chrono::{DateTime, Local};
 
+// According to InfiniTime protocol, -1 represents unknown sunrise/sunset time
+const UNKNOWN_TIME: i16 = -1;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum WeatherIcon {
@@ -72,9 +75,9 @@ impl InfiniTime {
         data.push(weather.icon as u8);
 
         // Sunrise and sunset (2 bytes each, little-endian)
-        // -1 means unknown according to InfiniTime protocol
-        let sunrise = weather.sunrise.map(|s| s as i16).unwrap_or(-1);
-        let sunset = weather.sunset.map(|s| s as i16).unwrap_or(-1);
+        // Use UNKNOWN_TIME (-1) when sunrise/sunset data is not available
+        let sunrise = weather.sunrise.map(|s| s as i16).unwrap_or(UNKNOWN_TIME);
+        let sunset = weather.sunset.map(|s| s as i16).unwrap_or(UNKNOWN_TIME);
         data.extend_from_slice(&sunrise.to_le_bytes());
         data.extend_from_slice(&sunset.to_le_bytes());
 
