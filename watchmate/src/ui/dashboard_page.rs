@@ -12,6 +12,7 @@ use version_compare::Version;
 mod media_player;
 mod fwupd;
 mod notifications;
+mod weather;
 
 
 #[derive(Debug)]
@@ -49,6 +50,7 @@ pub struct Model {
     // Components
     player_panel: Controller<media_player::Model>,
     notifications_panel: Controller<notifications::Model>,
+    weather_panel: Controller<weather::Model>,
     firmware_panel: Controller<fwupd::Model>,
     // Other
     infinitime: Option<Arc<bt::InfiniTime>>,
@@ -312,6 +314,13 @@ impl Component for Model {
                                     set_selectable: false,
                                     #[watch]
                                     set_sensitive: model.alias.is_some(),
+                                    set_child: Some(model.weather_panel.widget()),
+                                },
+
+                                gtk::ListBoxRow {
+                                    set_selectable: false,
+                                    #[watch]
+                                    set_sensitive: model.alias.is_some(),
                                     set_child: Some(model.notifications_panel.widget()),
                                 },
                             },
@@ -453,6 +462,10 @@ impl Component for Model {
             .launch(settings)
             .detach();
 
+        let weather_panel = weather::Model::builder()
+            .launch(())
+            .detach();
+
         let firmware_panel = fwupd::Model::builder()
             .launch(window)
             .forward(&sender.input_sender(), |message| match message {
@@ -472,6 +485,7 @@ impl Component for Model {
             fw_update_available: false,
             player_panel,
             notifications_panel,
+            weather_panel,
             firmware_panel,
             infinitime: None,
             data_task: None,
@@ -492,6 +506,9 @@ impl Component for Model {
                 );
                 self.notifications_panel.emit(
                     notifications::Input::Device(Some(infinitime.clone()))
+                );
+                self.weather_panel.emit(
+                    weather::Input::Device(Some(infinitime.clone()))
                 );
                 // Read data from the watch
                 self.data_task = Some(relm4::spawn(async move {
@@ -515,6 +532,7 @@ impl Component for Model {
                 // Propagate to components
                 self.player_panel.emit(media_player::Input::Device(None));
                 self.notifications_panel.emit(notifications::Input::Device(None));
+                self.weather_panel.emit(weather::Input::Device(None));
             }
             Input::LatestFirmwareVersion(latest) => {
                 self.fw_latest = latest;
