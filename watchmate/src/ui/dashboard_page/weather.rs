@@ -116,15 +116,17 @@ impl Component for Model {
                                     for provider in providers {
                                         sender.input(Input::ProviderAdded(provider));
                                     }
-                                    // Note: Real implementation would also set up a stream
-                                    // to watch for providers being added/removed
+                                    // TODO: Set up a stream to watch for providers being added/removed
+                                    // This will be implemented once weather apps add D-Bus support.
+                                    // The pattern should follow media_player's PlayersListEvent handling.
                                     log::info!("Weather provider discovery completed");
                                 }
                                 Err(error) => {
                                     log::error!("Failed to discover weather providers: {error}");
                                 }
                             }
-                            // Keep infinitime in scope to prevent unused warning
+                            // TODO: When weather data transmission is implemented, `infinitime` will be
+                            // used to send weather data to the watch. For now, keep it in scope.
                             let _ = infinitime;
                             sender.input(Input::WeatherUpdateSessionEnded);
                         });

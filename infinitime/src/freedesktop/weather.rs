@@ -94,12 +94,16 @@ impl WeatherProvider for GenericWeatherProvider {
 }
 
 /// Discover available weather providers on the system
-pub async fn discover_weather_providers(_connection: &Connection) -> Result<Vec<String>> {
-    // This is a placeholder for weather provider discovery
-    // In a real implementation, this would:
+pub async fn discover_weather_providers(connection: &Connection) -> Result<Vec<String>> {
+    // TODO: Implement actual D-Bus provider discovery once weather apps add D-Bus support
+    // This function will:
     // 1. Check for KDE Weather D-Bus service (org.kde.kweather)
-    // 2. Check for GNOME Weather D-Bus service (org.gnome.Weather)
+    // 2. Check for GNOME Weather D-Bus service (org.gnome.Weather.Application)
     // 3. Detect if they're running as binary, flatpak, snap, etc.
+    // 4. Return list of available provider names
+    
+    // The `connection` parameter will be used to query D-Bus for available services
+    let _ = connection; // Suppress unused warning until implementation
     
     // For now, return an empty list to indicate no providers found
     Ok(vec![])
